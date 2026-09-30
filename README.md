@@ -100,6 +100,38 @@ Plain RRT uses step size 1 and a 20 000-iteration budget.
 On the longest cross-map queries, plain RRT succeeded in only 20–60 % of runs.
 The guided planner never failed.
 
+### Python vs. original MATLAB implementation
+
+The same 14 start/goal queries from the original MATLAB experiments
+(`python scripts/compare_matlab.py`). Coordinates are MATLAB 1-based (row, col).
+Python times are the mean of 20 random seeds.
+
+| # | Start | Goal | MATLAB time (s) | Python time (ms) | Python iterations |
+|---|---|---|---|---|---|
+| 1 | (150, 797) | (725, 219) | 2.521 | 1.37 | 49 |
+| 2 | (536, 245) | (451, 241) | 0.472 | 0.14 | 3 |
+| 3 | (451, 245) | (254, 368) | 1.472 | 0.41 | 12 |
+| 4 | (195, 244) | (142, 573) | 0.917 | 0.36 | 10 |
+| 5 | (232, 388) | (150, 797) | 1.194 | 0.56 | 18 |
+| 6 | (568, 305) | (697, 242) | 2.992 | 0.62 | 22 |
+| 7 | (184, 391) | (182, 611) | 0.809 | 0.28 | 8 |
+| 8 | (393, 293) | (583, 277) | 1.002 | 0.34 | 8 |
+| 9 | (725, 219) | (150, 797) | 3.050 | 1.52 | 60 |
+| 10 | (345, 239) | (207, 625) | 1.347 | 0.83 | 23 |
+| 11 | (345, 239) | (207, 625) | 13.726 | 0.81 | 23 |
+| 12 | (451, 241) | (184, 391) | 0.996 | 0.63 | 19 |
+| 13 | (583, 277) | (345, 239) | 0.784 | 0.75 | 20 |
+| 14 | (205, 658) | (145, 657) | 6.948 | 3.05 | 102 |
+| | **Mean** | | **2.731** | **0.83** | **27** |
+
+This is not an apples-to-apples speed test. The MATLAB `tic/toc` wrapped the
+whole loop, which **redrew the tree and called `pause(0.01)` on every
+iteration**, so most of its time is plotting. The Python times cover the
+algorithm alone, with vectorised NumPy collision checks. At ~10 ms of pause per
+iteration, the ~27 iterations a query needs already account for ~0.3 s of the
+MATLAB time before any drawing. Rows 10 and 11 are the same query run twice in MATLAB; the 10× gap
+between them shows how much a single random run can vary.
+
 ## Repository layout
 
 ```
@@ -114,6 +146,7 @@ scripts/
   compare.py        # side-by-side vs. plain RRT
   gallery.py        # grid of example paths
   benchmark.py      # success / time / length over many queries
+  compare_matlab.py # timing table vs. the original MATLAB runs
   animate.py        # GIF of the tree growing (docs/images/demo.gif)
 data/
   map.npz                  # 900×1200 binary occupancy grid (True = obstacle)
