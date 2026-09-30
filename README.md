@@ -6,6 +6,13 @@ small set of pre-selected reference points** on a known map. The result is a
 planner that is orders of magnitude faster than pixel-level RRT, does not get
 trapped in narrow corridors, and produces short, repeatable paths.
 
+<p align="center"><img src="docs/images/demo.gif" width="560" alt="Tree growing through reference points"></p>
+
+*Each frame: a sample (orange ×) is drawn — the goal itself half of the time —
+the nearest tree node is found, and the tree jumps to the closest
+collision-free reference point inside the yellow ±60° sector. The final path
+is shown in green.*
+
 ![Reference-point-guided RRT vs. plain RRT](docs/images/compare.png)
 
 *Left: the tree hops between reference points (cyan) and reaches the goal in 41
@@ -107,6 +114,7 @@ scripts/
   compare.py        # side-by-side vs. plain RRT
   gallery.py        # grid of example paths
   benchmark.py      # success / time / length over many queries
+  animate.py        # GIF of the tree growing (docs/images/demo.gif)
 data/
   map.npz                  # 900×1200 binary occupancy grid (True = obstacle)
   reference_points.csv     # 53 reference points, (row, col)
@@ -121,6 +129,7 @@ python scripts/run_demo.py                                   # default query
 python scripts/run_demo.py --start 344 238 --goal 206 624 --seed 1
 python scripts/compare.py
 python scripts/benchmark.py --runs 10
+python scripts/animate.py --out docs/images/demo.gif         # needs Pillow (installed with matplotlib)
 ```
 
 ```python

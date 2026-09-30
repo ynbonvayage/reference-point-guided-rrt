@@ -39,6 +39,7 @@ class PlanResult:
     seconds: float
     success: bool
     history: list = field(default_factory=list)  # tree size after each iteration
+    trace: list = field(default_factory=list)    # (sample, nearest node index) per iteration
 
 
 def _sample(rng, shape, goal, epsilon):
@@ -79,6 +80,7 @@ def plan(occupancy, reference_points, start, goal, *, epsilon=0.5,
     parents = [-1]
     in_tree = {tuple(start)}
     history = []
+    trace = []
     t0 = time.perf_counter()
 
     reached = tuple(start) == tuple(goal)
@@ -90,6 +92,7 @@ def plan(occupancy, reference_points, start, goal, *, epsilon=0.5,
         tree = np.asarray(nodes)
         nearest = int(np.argmin(np.linalg.norm(tree - target, axis=1)))
         near = tree[nearest]
+        trace.append((target, nearest))
 
         candidates = _candidates_in_sector(refs, near, target, radius, half_angle)
         free = [i for i in candidates if segment_is_free(occupancy, near, refs[i])]
@@ -116,4 +119,4 @@ def plan(occupancy, reference_points, start, goal, *, epsilon=0.5,
         path.reverse()
 
     return PlanResult(np.asarray(path).reshape(-1, 2), nodes, parents,
-                      iteration, seconds, reached, history)
+                      iteration, seconds, reached, history, trace)
